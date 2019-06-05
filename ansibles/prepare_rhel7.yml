@@ -7,11 +7,6 @@
       include_vars:
         file: defaults/main.yml
 
-    - name: clean rhel7 box internal repos
-      file:
-        path: /etc/yum.repos.d/pulp.repo
-        state: absent
-
     - name: Subscribe to Red Hat
       redhat_subscription:
         state: present
@@ -28,6 +23,6 @@
     - name: Up it!
       package: name=* state=latest
 
-    - name: install redhat nordics sa blog
-      include_role:
-        name: redhatnordicssa-blog
+#    - name: install redhat nordics sa blog
+#      include_role:
+#        name: redhatnordicssa-blog
