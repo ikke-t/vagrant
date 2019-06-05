@@ -1,0 +1,17 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "generic/rhel8"
+  config.vm.define "rhel-test" do |rhel|
+          rhel.vm.hostname   = "rhel-test"
+          rhel.vm.network :private_network, ip: "192.168.60.10", :netmask => "255.255.255.0"
+          rhel.vm.provision :ansible do |ansible|
+            ansible.playbook = "../ansibles/prepare_rhel8.yml"
+          end
+  end
+
+  config.vm.provider "libvirt" do |vb|
+    vb.memory = "1024"
+  end
+end
