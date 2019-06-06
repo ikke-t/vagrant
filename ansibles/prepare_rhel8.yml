@@ -1,4 +1,9 @@
 ---
+#
+# This version is for Red Hat tech update demo day 2019-June
+# to setup basics for the demos.
+#
+
 - hosts:  all
   become: yes
   vars:
@@ -22,9 +27,104 @@
         name: "{{ enabled_repos }}"
         state: enabled
 
-    - name: Up it!
-      package: name=* state=latest
+    # - name: Up it!
+    #   package: name=* state=latest
 
 #    - name: install redhat nordics sa blog
 #      include_role:
 #        name: redhatnordicssa-blog
+
+    - name: install stuff for demo
+      package:
+        name:
+          - cockpit
+          - cockpit-bridge
+          - cockpit-composer
+          - cockpit-dashboard
+          - cockpit-machines
+          - cockpit-packagekit
+          - cockpit-session-recording
+          - cockpit-storaged
+          - cockpit-system
+          - cockpit-ws
+          - insights-client
+          - stratisd
+          - stratis-cli
+          - dnf-utils
+          - createrepo_c
+          - composer-cli
+          - lorax-composer
+          - httpd
+          - git
+          - boom-boot
+          - stratisd
+          - stratis-cli
+          - sssd-client
+          - sssd-common
+
+
+    - name: enable services
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items:
+        - cockpit.socket
+        - httpd
+        - lorax-composer
+        - stratisd
+        - sssd
+
+    - name: clone repos content
+      command: reposync -n -p /var/www/html --repoid "{{ item }}" --downloadcomps --download-metadata
+      args:
+        creates: "/var/www/html/{{ item }}"
+      with_items:
+        - rhel-8-for-x86_64-baseos-rpms
+        - rhel-8-for-x86_64-appstream-rpms
+
+    - name: create local repos
+      command: createrepo -v "/var/www/html/{{ item }}" -g $(ls "/var/www/html/{{ item }}/repodata/*comps.xml")
+      args:
+        creates: "/var/www/html/{{ item }}"
+      with_items:
+        - rhel-8-for-x86_64-baseos-rpms
+        - rhel-8-for-x86_64-appstream-rpms
+
+    - name: create repo file
+      copy:
+        dest: /etc/yum.repos.d/rhel.repo
+        content: |
+          [baseos-rpms]
+          name=baseos-rpms
+          baseurl=http://localhost/rhel-8-for-x86_64-baseos-rpms
+          enabled=1
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+          [appstream-rpms]
+          name=appstream-rpms
+          baseurl=http://localhost/rhel-8-for-x86_64-appstream-rpms
+          enabled=1
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+    - name: create sssd conf for session recording
+      copy:
+        dest: /etc/sssd/sssd.conf
+        mode: 0600
+        content: |
+          [domain/local]
+          id_provider = files
+
+          [sssd]
+          domains = local
+          services = nss, pam, ssh, sudo
+      notify: restart sssd
+
+
+  handlers:
+    - name: restart sssd
+      service:
+        name: sssd
+        state: restarted
+        enabled: true
