@@ -19,11 +19,11 @@
 
     - name: Enable required repositories
       rhsm_repository:
-        name: "{{ enabled_repos }}"
+        name: "{{ enabled_repos_rhel8 }}"
         state: enabled
 
-    - name: Up it!
-      package: name=* state=latest
+#    - name: Up it!
+#      package: name=* state=latest
 
 #    - name: install redhat nordics sa blog
 #      include_role:

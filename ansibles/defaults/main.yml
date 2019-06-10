@@ -18,10 +18,12 @@ subs_pw: !vault |
 subs_pool: Employee SKU
 
 # XXX ToDo: Move these behind automatic host os selection
-enabled_repos:
+enabled_repos_rhel7:
+  - rhel-7-server-rpms
+  - rhel-7-server-optional-rpms
+  - rhel-7-server-extras-rpms
+
+enabled_repos_rhel8:
   - rhel-8-for-x86_64-appstream-rpms
   - rhel-8-for-x86_64-baseos-rpms
   - ansible-2-for-rhel-8-x86_64-rpms
-    # - rhel-7-server-rpms
-    # - rhel-7-server-optional-rpms
-    # - rhel-7-server-extras-rpms
