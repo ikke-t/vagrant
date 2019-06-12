@@ -14,18 +14,36 @@
       include_vars:
         file: defaults/main.yml
 
-    - name: Subscribe to Red Hat
-      redhat_subscription:
-        state: present
-        username: "{{ subs_username }}"
-        password: "{{ subs_pw }}"
-        autosubscribe: false
-        pool: "{{ subs_pool }}"
+#    - name: Subscribe to Red Hat
+#      redhat_subscription:
+#        state: present
+#        username: "{{ subs_username }}"
+#        password: "{{ subs_pw }}"
+#        autosubscribe: false
+#        pool: "{{ subs_pool }}"
 
-    - name: Enable required repositories
-      rhsm_repository:
-        name: "{{ enabled_repos }}"
-        state: enabled
+    - name: create repo file
+      copy:
+        dest: /etc/yum.repos.d/rhel.repo
+        content: |
+          [baseos-rpms]
+          name=baseos-rpms
+          baseurl=http://192.168.122.1/repos/rhel-8-for-x86_64-baseos-rpms
+          enabled=1
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+          [appstream-rpms]
+          name=appstream-rpms
+          baseurl=http://192.168.122.1/repos/rhel-8-for-x86_64-appstream-rpms
+          enabled=1
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+
+    # - name: Enable required repositories
+    #   rhsm_repository:
+    #     name: "{{ enabled_repos }}"
+    #     state: enabled
 
     # - name: Up it!
     #   package: name=* state=latest
@@ -75,38 +93,38 @@
         - stratisd
         - sssd
 
-    - name: clone repos content
-      command: reposync -n -p /var/www/html --repoid "{{ item }}" --downloadcomps --download-metadata
-      args:
-        creates: "/var/www/html/{{ item }}"
-      with_items:
-        - rhel-8-for-x86_64-baseos-rpms
-        - rhel-8-for-x86_64-appstream-rpms
-
-    - name: create local repos
-      command: createrepo -v "/var/www/html/{{ item }}" -g $(ls "/var/www/html/{{ item }}/repodata/*comps.xml")
-      args:
-        creates: "/var/www/html/{{ item }}"
-      with_items:
-        - rhel-8-for-x86_64-baseos-rpms
-        - rhel-8-for-x86_64-appstream-rpms
-
-    - name: create repo file
-      copy:
-        dest: /etc/yum.repos.d/rhel.repo
-        content: |
-          [baseos-rpms]
-          name=baseos-rpms
-          baseurl=http://localhost/rhel-8-for-x86_64-baseos-rpms
-          enabled=1
-          gpgcheck=1
-          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-          [appstream-rpms]
-          name=appstream-rpms
-          baseurl=http://localhost/rhel-8-for-x86_64-appstream-rpms
-          enabled=1
-          gpgcheck=1
-          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+    # - name: clone repos content
+    #   command: reposync -n -p /var/www/html --repoid "{{ item }}" --downloadcomps --download-metadata
+    #   args:
+    #     creates: "/var/www/html/{{ item }}"
+    #   with_items:
+    #     - rhel-8-for-x86_64-baseos-rpms
+    #     - rhel-8-for-x86_64-appstream-rpms
+    #
+    # - name: create local repos
+    #   command: createrepo -v "/var/www/html/{{ item }}" -g $(ls "/var/www/html/{{ item }}/repodata/*comps.xml")
+    #   args:
+    #     creates: "/var/www/html/{{ item }}"
+    #   with_items:
+    #     - rhel-8-for-x86_64-baseos-rpms
+    #     - rhel-8-for-x86_64-appstream-rpms
+    #
+    # - name: create repo file
+    #   copy:
+    #     dest: /etc/yum.repos.d/rhel.repo
+    #     content: |
+    #       [baseos-rpms]
+    #       name=baseos-rpms
+    #       baseurl=http://localhost/rhel-8-for-x86_64-baseos-rpms
+    #       enabled=1
+    #       gpgcheck=1
+    #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+    #       [appstream-rpms]
+    #       name=appstream-rpms
+    #       baseurl=http://localhost/rhel-8-for-x86_64-appstream-rpms
+    #       enabled=1
+    #       gpgcheck=1
+    #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 
     - name: create sssd conf for session recording
       copy:
