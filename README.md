@@ -6,9 +6,9 @@ linux boxes.
 On CentOS 8 I had to do the following steps to prepare for Vagrant (installing bunch of dependencies for vagrant-libvirt plugin):
 
 ```
-dnf install https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.rpm
-dnf groupinstall 'Development Tools' 'Virtualization Host'
-dnf install libvirt-devel libxslt-devel libxml2-devel libvirt-devel libguestfs-tools-c
+sudo dnf install https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.rpm
+sudon dnf groupinstall 'Development Tools' 'Virtualization Host'
+sudo dnf install libvirt-devel libxslt-devel libxml2-devel libvirt-devel libguestfs-tools-c
 CONFIGURE_ARGS='with-ldflags=-L/opt/vagrant/embedded/lib with-libvirt-include=/usr/include/libvirt with-libvirt-lib=/usr/lib' \ 
   GEM_HOME=~/.vagrant.d/gems GEM_PATH=$GEM_HOME:/opt/vagrant/embedded/gems  \
   PATH=/opt/vagrant/embedded/bin:$PATH \
