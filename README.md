@@ -5,11 +5,16 @@ linux boxes.
 
 On CentOS 8 I had to do the following steps to prepare for Vagrant (installing bunch of dependencies for vagrant-libvirt plugin):
 
-1. dnf install https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.rpm
-2. dnf groupinstall 'Development Tools'
-3. dnf install libvirt-devel libxslt-devel libxml2-devel libvirt-devel libguestfs-tools-c
-3. vagrant plugin install vagrant-libvirt
-4. cd $HOME; git clone https://github.com/ikke-t/vagrant.git
+```
+dnf install https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.rpm
+dnf groupinstall 'Development Tools' 'Virtualization Host'
+dnf install libvirt-devel libxslt-devel libxml2-devel libvirt-devel libguestfs-tools-c
+CONFIGURE_ARGS='with-ldflags=-L/opt/vagrant/embedded/lib with-libvirt-include=/usr/include/libvirt with-libvirt-lib=/usr/lib' \ 
+  GEM_HOME=~/.vagrant.d/gems GEM_PATH=$GEM_HOME:/opt/vagrant/embedded/gems  \
+  PATH=/opt/vagrant/embedded/bin:$PATH \
+  vagrant plugin install vagrant-libvirt
+cd $HOME; git clone https://github.com/ikke-t/vagrant.git
+```
 
 Naturally, check for the latest vagrant version at the time you are doing this.
 
